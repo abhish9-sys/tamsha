@@ -1,36 +1,27 @@
-FROM python:3.6-slim
+#Base Image node:12.18.4-alpine
+FROM node:12.18.4-alpine
 
-ENV PYTHONDONTWRITEBYTECODE 1
 
-ENV PYTHONUNBUFFERED 1
+#Set working directory to /app
+WORKDIR /app
 
-RUN mkdir /code
 
-WORKDIR /code
+#Set PATH /app/node_modules/.bin
+ENV PATH /app/node_modules/.bin:$PATH
 
-RUN pip install --upgrade pip
 
-COPY requirements.txt /code/
+#Copy package.json in the image
+COPY package.json ./
 
-RUN pip install -r requirements.txt
 
-COPY . /code/
+#Run npm install command
+RUN npm install
 
-EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-#FROM python:3.7
-#
-## Allows docker to cache installed dependencies between builds
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r requirements.txt
-#
-## Mounts the application code to the image
-#COPY . code
-#WORKDIR /code
-#
-#EXPOSE 8000
-#
-## runs the production server
-#ENTRYPOINT ["python", "mysite/manage.py"]
-#CMD ["runserver", "0.0.0.0:8000"]
+#Copy the app
+COPY . ./
+
+EXPOSE 3000
+
+#Start the app
+CMD ["node", "./src/server.js"]
